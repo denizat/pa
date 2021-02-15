@@ -1,0 +1,99 @@
+#!/bin/bash
+# (wall)pa(per) changer
+
+# Folder where papers are stored
+f=~/.local/share/pa/
+p='xwallpaper '
+o=' --zoom '
+
+if test "$#" -eq 0
+then
+	#bg is default background
+	#$p$o $fbg # uncomment this if you want a normal bg
+	xwallpaper --center $f"bg"
+	exit 0
+fi
+
+
+
+for arg in "$@"
+do
+	if ! [[ $arg = -* ]]
+	then
+		$p$o $f$1
+		exit 0
+	fi
+	case $arg in
+		-l|--list)
+		ls $f
+		exit 0
+		;;
+		-a|--add)
+		shift
+		cp $@ -t $f
+		exit 0
+		;;
+		-r|--remove)
+		shift
+		rm $f$@
+		exit 0
+		;;
+		-c|--copy)
+		shift
+		cp $f$@ . # If you want to copy all, give * as "*"
+		exit 0
+		;;
+		-m|--move)
+		mv $f$2 $f$3
+		exit 0
+		;;
+		-o|--option)
+		$p$2 $f$3
+		exit 0
+		;;
+#		-cd|--changedir)
+#		sed "s/f=.*/$2" pa
+#		exit 0
+#		;;
+		-d|--directory)
+		echo $f
+		exit 0
+		;;
+		-s|--show)
+		for file in $(ls $f)
+		do
+			pa $file
+			read
+		done
+		exit 0
+		;;
+		-sc|--showcase)
+		for file in $(ls $f)
+		do
+			pa $file
+			sleep ${2-10}
+		done
+		exit 0
+		;;
+		-ll|--loop)
+		while :
+		do
+			for file in $(ls $f)
+			do
+				pa $file
+				sleep ${2-10}
+			done
+		done
+		;;
+		-se|--see)
+		sxiv $f${2-*}
+		exit 0
+		;;
+		--init)
+		chmod +x ./pa
+		mv -f ./pa ~/.local/bin
+		mkdir ~/.local/share/pa
+		exit 0
+		;;
+	esac
+done
