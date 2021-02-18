@@ -5,7 +5,7 @@
 # folder for wallpapers
 f=~/.local/share/pa/
 # program for wallpapers
-p='xwallpaper '
+p='xwallpaper'
 # options for wallpapers
 o='--zoom'
 # built in theme for background "bg"
@@ -13,13 +13,9 @@ d='--theme base16-gruvbox-hard'
 # wal options
 wo='-q -n -i'
 
-# TODO
-# Make the args properly, especially -o and -w
-
 if test "$#" -eq 0
 then
 	#bg is default background
-	#$p$o $fbg # uncomment this if you want a normal bg
 	$p --center $f"bg"
 	#This is to immediately change the colors
 	wal -q -n $d
@@ -66,7 +62,6 @@ do
 		shift
 		o=$1
 		shift
-		#$p$2 $f$3
 		;;
 		-w|--wal)
 		shift
@@ -137,12 +132,12 @@ do
 		sxiv $f${2-*}
 		exit
 		;;
-#		--init)
-#		chmod +x ./pa
-#		mv -f ./pa ~/.local/bin
-#		mkdir ~/.local/share/pa
-#		exit
-#		;;
+		--init)
+		chmod +x pa
+		cp -f pa ~/.local/bin
+		mkdir ~/.local/share/pa
+		exit
+		;;
 	esac
 done
 
