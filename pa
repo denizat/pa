@@ -1,55 +1,81 @@
 #!/bin/bash
 # (wall)pa(per) changer
 
-# Folder where papers are stored
+##defaults
+# folder for wallpapers
 f=~/.local/share/pa/
+# program for wallpapers
 p='xwallpaper '
-o=' --zoom '
+# options for wallpapers
+o='--zoom'
+# built in theme for background "bg"
+d='--theme base16-gruvbox-hard'
+# wal options
+wo='-q -n -i'
+
+# TODO
+# Make the args properly, especially -o and -w
 
 if test "$#" -eq 0
 then
 	#bg is default background
 	#$p$o $fbg # uncomment this if you want a normal bg
-	xwallpaper --center $f"bg"
-	exit 0
+	$p --center $f"bg"
+	#This is to immediately change the colors
+	wal -q -n $d
+	#This is to restore them to true defaults
+	xrdb ~/.config/x11/xresources
+	exit
 fi
 
 
+if ! [[ $1 = -* ]]
+then
+	$p $o $f$1
+	exit
+fi
 
 for arg in "$@"
 do
-	if ! [[ $arg = -* ]]
-	then
-		$p$o $f$1
-		exit 0
-	fi
 	case $arg in
 		-l|--list)
 		ls $f
-		exit 0
+		exit
 		;;
 		-a|--add)
 		shift
 		cp $@ -t $f
-		exit 0
+		exit
 		;;
 		-r|--remove)
 		shift
 		rm $f$@
-		exit 0
+		exit
 		;;
 		-c|--copy)
 		shift
 		cp $f$@ . # If you want to copy all, give * as "*"
-		exit 0
+		exit
 		;;
 		-m|--move)
-		mv $f$2 $f$3
-		exit 0
+		shift
+		mv $f$1 $f$2
+		exit
 		;;
 		-o|--option)
-		$p$2 $f$3
-		exit 0
+		shift
+		o=$1
+		shift
+		#$p$2 $f$3
+		;;
+		-w|--wal)
+		shift
+		w=true
+		;;
+		-wo|--wallopts)
+		shift
+		wo=$1
+		shift
 		;;
 #		-cd|--changedir)
 #		sed "s/f=.*/$2" pa
@@ -57,43 +83,72 @@ do
 #		;;
 		-d|--directory)
 		echo $f
-		exit 0
+		exit
 		;;
 		-s|--show)
+		if "$w" = true
+		then
+			for file in $(ls $f)
+			do
+				$p $o $f$file
+				wal $wo $f$file
+				read
+			done
+			exit
+		fi
+
 		for file in $(ls $f)
 		do
-			pa $file
+			$p $o $f$file
 			read
 		done
-		exit 0
-		;;
-		-sc|--showcase)
-		for file in $(ls $f)
-		do
-			pa $file
-			sleep ${2-10}
-		done
-		exit 0
+
+		exit
 		;;
 		-ll|--loop)
+		shift
+
+		if "$w" = true
+		then
+			while :
+			do
+				for file in $(ls $f)
+				do
+					$p $o $f$file
+					wal $wo $f$file
+					sleep ${1-20}
+				done
+			done
+			exit
+		fi
+
 		while :
 		do
 			for file in $(ls $f)
 			do
-				pa $file
-				sleep ${2-10}
+				$p $o $f$file
+				sleep ${1-20}
 			done
 		done
+
+		exit
 		;;
 		-se|--see)
 		sxiv $f${2-*}
-		exit 0
+		exit
 		;;
-		--init)
-		chmod +x ./pa
-		mv -f ./pa ~/.local/bin
-		mkdir ~/.local/share/pa
-		exit 0
-		;;
+#		--init)
+#		chmod +x ./pa
+#		mv -f ./pa ~/.local/bin
+#		mkdir ~/.local/share/pa
+#		exit
+#		;;
 	esac
 done
+
+$p $o $f$1
+
+if test "$w" = true
+then
+	wal $wo $f$1
+fi
