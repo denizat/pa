@@ -1,0 +1,3 @@
+cp -f pa ~/.local/bin
+echo here >> ~/.local/share/pa/scripts
+mkdir ~/.local/share/pa

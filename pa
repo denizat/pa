@@ -16,11 +16,10 @@ wo='-q -n -i'
 if test "$#" -eq 0
 then
 	#bg is default background
-	$p --center $f"bg"
-	#This is to immediately change the colors
-	wal -q -n $d
-	#This is to restore them to true defaults
-	xrdb ~/.config/x11/xresources
+	$p --center $f"../bg"
+	#Set colors to default
+	xrdb ~/.config/x11/xresources ;
+	kill -HUP $(pgrep -u $USER "\bdwm$")
 	exit
 fi
 
@@ -40,7 +39,7 @@ do
 		;;
 		-a|--add)
 		shift
-		cp $@ -t $f
+		cp -r $@ -t $f
 		exit
 		;;
 		-r|--remove)
@@ -72,34 +71,41 @@ do
 		wo=$1
 		shift
 		;;
-#		-cd|--changedir)
-#		sed "s/f=.*/$2" pa
-#		exit 0
-#		;;
 		-d|--directory)
 		echo $f
 		exit
 		;;
-		-s|--show)
-		if "$w" = true
-		then
-			for file in $(ls $f)
-			do
-				$p $o $f$file
-				wal $wo $f$file
-				read
-			done
-			exit
-		fi
-
-		for file in $(ls $f)
-		do
-			$p $o $f$file
-			read
-		done
-
+		# This runs the script in the folder
+		-s|--script)
+		shift
+		cat $f/scripts | grep $1 | sh
 		exit
 		;;
+		-cs|--change-scripts)
+		shift
+		echo $f/scripts
+		exit
+		;;
+		# -s|--show)
+		# if "$w" = true
+		# then
+		# 	for file in $(ls $f)
+		# 	do
+		# 		$p $o $f$file
+		# 		wal $wo $f$file
+		# 		read
+		# 	done
+		# 	exit
+		# fi
+
+		# for file in $(ls $f)
+		# do
+		# 	$p $o $f$file
+		# 	read
+		# done
+
+		# exit
+		# ;;
 		-ll|--loop)
 		shift
 
@@ -146,4 +152,5 @@ $p $o $f$1
 if test "$w" = true
 then
 	wal $wo $f$1
+	kill -HUP $(pgrep -u $USER "\bdwm$")
 fi
